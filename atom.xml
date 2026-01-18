@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>isssrs的个人博客</title>
+  
+  <subtitle>记录自己遇到的种种问题</subtitle>
+  <link href="https://blog.isssr.cn/atom.xml" rel="self"/>
+  
+  <link href="https://blog.isssr.cn/"/>
+  <updated>2026-01-18T14:34:28.751Z</updated>
+  <id>https://blog.isssr.cn/</id>
+  
+  <author>
+    <name>isssrs</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>使用Docker简单安装MySQL</title>
+    <link href="https://blog.isssr.cn/posts/7a834f591519/"/>
+    <id>https://blog.isssr.cn/posts/7a834f591519/</id>
+    <published>2026-01-18T14:22:35.000Z</published>
+    <updated>2026-01-18T14:34:28.751Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="简单安装mysql"><a href="#简单安装mysql" class="headerlink" title="简单安装mysql"></a>简单安装mysql</h1><p>官方文档：<a href="https://dev.mysql.com/doc/">MySQL :: MySQL Documentation</a><br>docker镜像（有文档）：<a href="https://hub.docker.com/_/mysql">mysql - 官方图片 |Docker 中心</a><br>guthub地址：<a href="https://github.com/mysql">MySQL · GitHub</a></p><h2 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a>拉取镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull mysql:9.4.0</span><br></pre></td></tr></table></figure><h2 id="创建文件夹"><a href="#创建文件夹" class="headerlink" title="创建文件夹"></a>创建文件夹</h2><p>在<code>D:\docker\mysql</code>目录下创建文件夹<code>data</code>：</p><p><img src="/posts/7a834f591519/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85MySQL0.png"></p><h2 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run --name mysql -p 3306:3306 `</span><br><span class="line"> -v D:/docker/mysql/data:/var/lib/mysql `</span><br><span class="line"> -e MYSQL_ROOT_PASSWORD=123456 `</span><br><span class="line"> -d mysql:9.4.0</span><br></pre></td></tr></table></figure><h3 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h3><p>mysql官方文档中的环境变量：<a href="https://dev.mysql.com/doc/refman/5.7/en/environment-variables.html">MySQL :: MySQL 5.7 Reference Manual :: 4.9 Environment Variables</a></p><h1 id="完结"><a href="#完结" class="headerlink" title="完结"></a>完结</h1>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;简单安装mysql&quot;&gt;&lt;a href=&quot;#简单安装mysql&quot; class=&quot;headerlink&quot; title=&quot;简单安装mysql&quot;&gt;&lt;/a&gt;简单安装mysql&lt;/h1&gt;&lt;p&gt;官方文档：&lt;a href=&quot;https://dev.mysql.com/doc/&quot;&gt;</summary>
+      
+    
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/categories/Docker/"/>
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/tags/Docker/"/>
+    
+    <category term="mySQL" scheme="https://blog.isssr.cn/tags/mySQL/"/>
+    
+  </entry>
+  
+</feed>
