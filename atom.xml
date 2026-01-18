@@ -6,7 +6,7 @@
   <link href="https://blog.isssr.cn/atom.xml" rel="self"/>
   
   <link href="https://blog.isssr.cn/"/>
-  <updated>2026-01-18T14:34:28.751Z</updated>
+  <updated>2026-01-18T17:54:21.360Z</updated>
   <id>https://blog.isssr.cn/</id>
   
   <author>
@@ -17,13 +17,125 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>使用Docker简单安装RocketMQ</title>
+    <link href="https://blog.isssr.cn/posts/85ee40cbed72/"/>
+    <id>https://blog.isssr.cn/posts/85ee40cbed72/</id>
+    <published>2026-01-18T17:50:11.000Z</published>
+    <updated>2026-01-18T17:54:21.360Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="简单安装rocketmq"><a href="#简单安装rocketmq" class="headerlink" title="简单安装rocketmq"></a>简单安装rocketmq</h1><p>rocketmq官方文档：<a href="https://rocketmq.apache.org/zh/docs/">为什么选择RocketMQ | RocketMQ</a><br>docker镜像（没有文档）：<a href="https://hub.docker.com/r/apache/rocketmq">apache&#x2F;rocketmq - Docker Image</a><br>guthub地址：<a href="https://github.com/apache/rocketmq">GitHub - apache&#x2F;rocketmq</a></p><h2 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a>拉取镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull apache/rocketmq:5.3.1</span><br></pre></td></tr></table></figure><h2 id="创建网络"><a href="#创建网络" class="headerlink" title="创建网络"></a>创建网络</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker network create rocketmq</span><br></pre></td></tr></table></figure><h2 id="创建rmqnamesrv容器"><a href="#创建rmqnamesrv容器" class="headerlink" title="创建rmqnamesrv容器"></a>创建rmqnamesrv容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name rmqnamesrv -p 9876:9876 --network rocketmq apache/rocketmq:5.3.1 sh mqnamesrv</span><br></pre></td></tr></table></figure><h2 id="创建文件夹和配置文件"><a href="#创建文件夹和配置文件" class="headerlink" title="创建文件夹和配置文件"></a>创建文件夹和配置文件</h2><p>在<code>D:\docker\rocketmq</code>目录下创建文件夹<code>config</code>：<br><img src="/posts/85ee40cbed72/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85RocketMQ0.png"><br>在<code>config</code>文件夹中创建文件<code>broker.conf</code>：<br><img src="/posts/85ee40cbed72/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85RocketMQ1.png"><br>里面的内容为：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">brokerIP1=你的IP地址</span><br><span class="line">namesrvAddr=127.0.0.1:9876</span><br></pre></td></tr></table></figure><h3 id="设置IP"><a href="#设置IP" class="headerlink" title="设置IP"></a>设置IP</h3><p>打开powershell输入<code>ipconfig</code>，查看你的IPv4地址：<br><img src="/posts/85ee40cbed72/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85RocketMQ2.png"><br>我电脑使用的是WiFi链接，找到如上图所示的IPv4地址然后与<code>你的IP地址</code>进行替换。</p><h2 id="创建rmqbroker容器"><a href="#创建rmqbroker容器" class="headerlink" title="创建rmqbroker容器"></a>创建rmqbroker容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker run -d `</span><br><span class="line">--name rmqbroker `</span><br><span class="line">--net rocketmq `</span><br><span class="line">-p 10912:10912 -p 10911:10911 -p 10909:10909 `</span><br><span class="line">-p 8080:8080 -p 8081:8081 `</span><br><span class="line">-e <span class="string">&quot;NAMESRV_ADDR=rmqnamesrv:9876&quot;</span> `</span><br><span class="line">-v D:\docker\rocketmq\config\broker.conf:/home/rocketmq/rocketmq-5.3.1/conf/broker.conf `</span><br><span class="line">apache/rocketmq:5.3.1 sh mqbroker --enable-proxy `</span><br><span class="line">-c /home/rocketmq/rocketmq-5.3.1/conf/broker.conf</span><br></pre></td></tr></table></figure><h2 id="拉取dashboard面板"><a href="#拉取dashboard面板" class="headerlink" title="拉取dashboard面板"></a>拉取dashboard面板</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull apacherocketmq/rocketmq-dashboard:2.1.0</span><br></pre></td></tr></table></figure><h2 id="创建rocketmq-dashboard容器"><a href="#创建rocketmq-dashboard容器" class="headerlink" title="创建rocketmq-dashboard容器"></a>创建rocketmq-dashboard容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name rocketmq-dashboard -e <span class="string">&quot;JAVA_OPTS=-Drocketmq.namesrv.addr=rmqnamesrv:9876&quot;</span> -p 9000:8082 --network rocketmq -t apacherocketmq/rocketmq-dashboard:2.1.0</span><br></pre></td></tr></table></figure><h2 id="docker部署官方文档"><a href="#docker部署官方文档" class="headerlink" title="docker部署官方文档"></a>docker部署官方文档</h2><p>docker部署rabbitmq：<a href="https://rocketmq.apache.org/zh/docs/quickStart/02quickstartWithDocker">Docker 部署 RocketMQ | RocketMQ</a><br>dockers部署rabbitmq dashboard：<a href="https://rocketmq.apache.org/zh/docs/deploymentOperations/04Dashboard">RocketMQ Dashboard | RocketMQ</a></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;简单安装rocketmq&quot;&gt;&lt;a href=&quot;#简单安装rocketmq&quot; class=&quot;headerlink&quot; title=&quot;简单安装rocketmq&quot;&gt;&lt;/a&gt;简单安装rocketmq&lt;/h1&gt;&lt;p&gt;rocketmq官方文档：&lt;a href=&quot;https://</summary>
+      
+    
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/categories/Docker/"/>
+    
+    <category term="RocketMQ" scheme="https://blog.isssr.cn/categories/Docker/RocketMQ/"/>
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/tags/Docker/"/>
+    
+    <category term="RocketMQ" scheme="https://blog.isssr.cn/tags/RocketMQ/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用Docker简单安装Minio</title>
+    <link href="https://blog.isssr.cn/posts/8e5689fcb3f3/"/>
+    <id>https://blog.isssr.cn/posts/8e5689fcb3f3/</id>
+    <published>2026-01-18T17:49:26.000Z</published>
+    <updated>2026-01-18T17:51:39.476Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="简单安装minio"><a href="#简单安装minio" class="headerlink" title="简单安装minio"></a>简单安装minio</h1><p>minio官方文档：<a href="https://www.minio.org.cn/docs/minio/container/index.html">MinIO对象存储 Container — MinIO中文文档 | MinIO Container中文文档</a><br>docker镜像（有文档）：<a href="https://hub.docker.com/r/minio/minio">minio&#x2F;minio - Docker Image</a><br>github地址：<a href="https://github.com/minio/minio">GitHub - minio&#x2F;minio</a></p><h2 id="创建文件夹"><a href="#创建文件夹" class="headerlink" title="创建文件夹"></a>创建文件夹</h2><p>在<code>D:\docker\minio</code>目录下创建<code>data</code>文件夹：<br><img src="/posts/8e5689fcb3f3/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85Minio0.png"></p><h2 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a>拉取镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull minio/minio:latest</span><br></pre></td></tr></table></figure><h2 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker run -d `</span><br><span class="line">--name minio `</span><br><span class="line">-p 9000:9000 `</span><br><span class="line">-p 9001:9001 `</span><br><span class="line">-e <span class="string">&quot;MINIO_ROOT_USER=admin&quot;</span> `</span><br><span class="line">-e <span class="string">&quot;MINIO_ROOT_PASSWORD=admin123456&quot;</span> `</span><br><span class="line">-v D:\docker\minio\data:/data `</span><br><span class="line">minio/minio:latest server /data `</span><br><span class="line">--console-address <span class="string">&#x27;:9001&#x27;</span></span><br></pre></td></tr></table></figure>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;简单安装minio&quot;&gt;&lt;a href=&quot;#简单安装minio&quot; class=&quot;headerlink&quot; title=&quot;简单安装minio&quot;&gt;&lt;/a&gt;简单安装minio&lt;/h1&gt;&lt;p&gt;minio官方文档：&lt;a href=&quot;https://www.minio.org.c</summary>
+      
+    
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/categories/Docker/"/>
+    
+    <category term="Minio" scheme="https://blog.isssr.cn/categories/Docker/Minio/"/>
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/tags/Docker/"/>
+    
+    <category term="Minio" scheme="https://blog.isssr.cn/tags/Minio/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用Docker简单安装RabbitMQ</title>
+    <link href="https://blog.isssr.cn/posts/4b6ed2907081/"/>
+    <id>https://blog.isssr.cn/posts/4b6ed2907081/</id>
+    <published>2026-01-18T17:44:54.000Z</published>
+    <updated>2026-01-18T17:47:53.392Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="简单安装rabbitmq"><a href="#简单安装rabbitmq" class="headerlink" title="简单安装rabbitmq"></a>简单安装rabbitmq</h1><p>rabbitmq官方文档：<a href="https://www.rabbitmq.com/docs">RabbitMQ Documentation | RabbitMQ</a><br>docker镜像（有文档）：<a href="https://hub.docker.com/_/rabbitmq">rabbitmq - Official Image | Docker Hub</a><br>guthub地址：<a href="https://github.com/rabbitmq">RabbitMQ · GitHub</a></p><h2 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a>拉取镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull rabbitmq:4.2.1-management</span><br></pre></td></tr></table></figure><h2 id="创建文件夹"><a href="#创建文件夹" class="headerlink" title="创建文件夹"></a>创建文件夹</h2><p>在<code>D:\docker\rabbitmq</code>目录下创建文件夹<code>data</code>：<br><img src="/posts/4b6ed2907081/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85RabbitMQ0.png"></p><h2 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">docker run -d `</span><br><span class="line">  --name rabbitmq `</span><br><span class="line">  -p 5672:5672 `</span><br><span class="line">  -p 15672:15672 `</span><br><span class="line">  -e RABBITMQ_DEFAULT_USER=root `</span><br><span class="line">  -e RABBITMQ_DEFAULT_PASS=123456 `</span><br><span class="line">  -v D:\docker\rabbitmq\data:/var/lib/rabbitmq `</span><br><span class="line">  rabbitmq:4.2.1-management</span><br></pre></td></tr></table></figure><h3 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h3><p>关于RabbitMQ本身支持的环境变量列表，请参见<a href="https://www.rabbitmq.com/docs/configure#supported-environment-variables">Configuration | RabbitMQ</a></p><h1 id="完结"><a href="#完结" class="headerlink" title="完结"></a>完结</h1>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;简单安装rabbitmq&quot;&gt;&lt;a href=&quot;#简单安装rabbitmq&quot; class=&quot;headerlink&quot; title=&quot;简单安装rabbitmq&quot;&gt;&lt;/a&gt;简单安装rabbitmq&lt;/h1&gt;&lt;p&gt;rabbitmq官方文档：&lt;a href=&quot;https://</summary>
+      
+    
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/categories/Docker/"/>
+    
+    <category term="RabbitMQ" scheme="https://blog.isssr.cn/categories/Docker/RabbitMQ/"/>
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/tags/Docker/"/>
+    
+    <category term="RabbitMQ" scheme="https://blog.isssr.cn/tags/RabbitMQ/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用Docker简单安装Redis</title>
+    <link href="https://blog.isssr.cn/posts/8524df77b601/"/>
+    <id>https://blog.isssr.cn/posts/8524df77b601/</id>
+    <published>2026-01-18T15:20:01.000Z</published>
+    <updated>2026-01-18T17:46:06.314Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="简单安装redis"><a href="#简单安装redis" class="headerlink" title="简单安装redis"></a>简单安装redis</h1><p>redis官网：<a href="https://redis.io/docs/latest/">Docs</a><br>docker镜像（有文档）：<a href="https://hub.docker.com/_/redis">redis - Official Image | Docker Hub</a><br>guthub地址：<a href="https://github.com/redis/redis">GitHub - redis&#x2F;redis</a></p><h2 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a>拉取镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull redis:8.4.0</span><br></pre></td></tr></table></figure><h2 id="创建文件夹和配置文件"><a href="#创建文件夹和配置文件" class="headerlink" title="创建文件夹和配置文件"></a>创建文件夹和配置文件</h2><p>在目录<code>D:\docker\redis</code>下创建文件夹<code>config</code>和文件夹<code>data</code>：</p><p><img src="/posts/8524df77b601/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85Redis0.png"></p><h3 id="从github中下载对应版本的源码"><a href="#从github中下载对应版本的源码" class="headerlink" title="从github中下载对应版本的源码"></a>从github中下载对应版本的源码</h3><p>发布的各个版本：<a href="https://github.com/redis/redis/releases">Releases · redis&#x2F;redis · GitHub</a><br>下载对应的源码：<br><img src="/posts/8524df77b601/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85Redis1.png"></p><p>打开压缩包把<code>redis.conf</code>文件拷贝到<code>config</code>目录下：</p><p><img src="/posts/8524df77b601/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85Redis2.png"></p><p><img src="/posts/8524df77b601/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85Redis3.png"></p><h3 id="修改配置"><a href="#修改配置" class="headerlink" title="修改配置"></a>修改配置</h3><p>第<code>1068</code>行设置密码：<br><img src="/posts/8524df77b601/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85Redis4.png"><br>第<code>88</code>行设置绑定IP：<br><img src="/posts/8524df77b601/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85Redis5.png"><br>第<code>1405</code>行设置持久化：<br><img src="/posts/8524df77b601/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85Redis6.png"><br>第<code>139</code>行设置访问端口：<br><img src="/posts/8524df77b601/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85Redis7.png"></p><h2 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run --name redis `</span><br><span class="line">  -p 6379:6379 `</span><br><span class="line">  -v D:\docker\redis\config\redis.conf:/etc/redis/redis.conf `</span><br><span class="line">  -v D:\docker\redis\data:/data `</span><br><span class="line">  -d redis:8.4.0 redis-server /etc/redis/redis.conf</span><br></pre></td></tr></table></figure><h2 id="redis持久化文档"><a href="#redis持久化文档" class="headerlink" title="redis持久化文档"></a>redis持久化文档</h2><p>redis持久化文档：<a href="https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/">Redis persistence | Docs</a></p><h1 id="完结"><a href="#完结" class="headerlink" title="完结"></a>完结</h1>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;简单安装redis&quot;&gt;&lt;a href=&quot;#简单安装redis&quot; class=&quot;headerlink&quot; title=&quot;简单安装redis&quot;&gt;&lt;/a&gt;简单安装redis&lt;/h1&gt;&lt;p&gt;redis官网：&lt;a href=&quot;https://redis.io/docs/lat</summary>
+      
+    
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/categories/Docker/"/>
+    
+    <category term="Redis" scheme="https://blog.isssr.cn/categories/Docker/Redis/"/>
+    
+    
+    <category term="Docker" scheme="https://blog.isssr.cn/tags/Docker/"/>
+    
+    <category term="Redis" scheme="https://blog.isssr.cn/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
     <title>使用Docker简单安装MySQL</title>
     <link href="https://blog.isssr.cn/posts/7a834f591519/"/>
     <id>https://blog.isssr.cn/posts/7a834f591519/</id>
     <published>2026-01-18T14:22:35.000Z</published>
-    <updated>2026-01-18T14:34:28.751Z</updated>
+    <updated>2026-01-18T17:46:39.157Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="简单安装mysql"><a href="#简单安装mysql" class="headerlink" title="简单安装mysql"></a>简单安装mysql</h1><p>官方文档：<a href="https://dev.mysql.com/doc/">MySQL :: MySQL Documentation</a><br>docker镜像（有文档）：<a href="https://hub.docker.com/_/mysql">mysql - 官方图片 |Docker 中心</a><br>guthub地址：<a href="https://github.com/mysql">MySQL · GitHub</a></p><h2 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a>拉取镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull mysql:9.4.0</span><br></pre></td></tr></table></figure><h2 id="创建文件夹"><a href="#创建文件夹" class="headerlink" title="创建文件夹"></a>创建文件夹</h2><p>在<code>D:\docker\mysql</code>目录下创建文件夹<code>data</code>：</p><p><img src="/posts/7a834f591519/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85MySQL0.png"></p><h2 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run --name mysql -p 3306:3306 `</span><br><span class="line"> -v D:/docker/mysql/data:/var/lib/mysql `</span><br><span class="line"> -e MYSQL_ROOT_PASSWORD=123456 `</span><br><span class="line"> -d mysql:9.4.0</span><br></pre></td></tr></table></figure><h3 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h3><p>mysql官方文档中的环境变量：<a href="https://dev.mysql.com/doc/refman/5.7/en/environment-variables.html">MySQL :: MySQL 5.7 Reference Manual :: 4.9 Environment Variables</a></p><h1 id="完结"><a href="#完结" class="headerlink" title="完结"></a>完结</h1>]]></content>
+    <content type="html"><![CDATA[<h1 id="简单安装mysql"><a href="#简单安装mysql" class="headerlink" title="简单安装mysql"></a>简单安装mysql</h1><p>官方文档：<a href="https://dev.mysql.com/doc/">MySQL :: MySQL Documentation</a><br>docker镜像（有文档）：<a href="https://hub.docker.com/_/mysql">mysql - 官方图片 |Docker 中心</a><br>github地址：<a href="https://github.com/mysql">MySQL · GitHub</a></p><h2 id="拉取镜像"><a href="#拉取镜像" class="headerlink" title="拉取镜像"></a>拉取镜像</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull mysql:9.4.0</span><br></pre></td></tr></table></figure><h2 id="创建文件夹"><a href="#创建文件夹" class="headerlink" title="创建文件夹"></a>创建文件夹</h2><p>在<code>D:\docker\mysql</code>目录下创建文件夹<code>data</code>：</p><p><img src="/posts/7a834f591519/%E4%BD%BF%E7%94%A8Docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85MySQL0.png"></p><h2 id="创建容器"><a href="#创建容器" class="headerlink" title="创建容器"></a>创建容器</h2><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run --name mysql -p 3306:3306 `</span><br><span class="line"> -v D:/docker/mysql/data:/var/lib/mysql `</span><br><span class="line"> -e MYSQL_ROOT_PASSWORD=123456 `</span><br><span class="line"> -d mysql:9.4.0</span><br></pre></td></tr></table></figure><h3 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h3><p>mysql官方文档中的环境变量：<a href="https://dev.mysql.com/doc/refman/5.7/en/environment-variables.html">MySQL :: MySQL 5.7 Reference Manual :: 4.9 Environment Variables</a></p><h1 id="完结"><a href="#完结" class="headerlink" title="完结"></a>完结</h1>]]></content>
     
     
       
@@ -35,10 +147,12 @@
     
     <category term="Docker" scheme="https://blog.isssr.cn/categories/Docker/"/>
     
+    <category term="MySQL" scheme="https://blog.isssr.cn/categories/Docker/MySQL/"/>
+    
     
     <category term="Docker" scheme="https://blog.isssr.cn/tags/Docker/"/>
     
-    <category term="mySQL" scheme="https://blog.isssr.cn/tags/mySQL/"/>
+    <category term="MySQL" scheme="https://blog.isssr.cn/tags/MySQL/"/>
     
   </entry>
   
